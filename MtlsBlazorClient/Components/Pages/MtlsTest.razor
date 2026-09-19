@@ -1,0 +1,29 @@
+﻿@page "/mtls-test"
+@inject HttpClient Http
+@attribute [StreamRendering]
+
+<h3>mTLS Test</h3>
+
+<button @onclick="CallApi">Call Secure API</button>
+
+@if (_response != null)
+{
+    <pre>@_response</pre>
+}
+
+@code {
+    private string? _response;
+
+    private async Task CallApi()
+    {
+        try
+        {
+            var result = await Http.GetAsync("api/secure/ping");
+            _response = await result.Content.ReadAsStringAsync();
+        }
+        catch (Exception ex)
+        {
+            _response = $"Error: {ex.Message}";
+        }
+    }
+}
