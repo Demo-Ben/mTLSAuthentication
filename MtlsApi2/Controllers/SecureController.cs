@@ -13,6 +13,8 @@ namespace MtlsApi2.Controllers
         //[Authorize(Policy = "ClientCertificate")]
         public IActionResult Ping()
         {
+            // ** Verify that the client certificate is present and valid
+
             //var cert = HttpContext.Connection.ClientCertificate;
 
             //if (cert == null)
