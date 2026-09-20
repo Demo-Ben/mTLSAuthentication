@@ -4,8 +4,7 @@ using MtlsApi.Authorization;
 
 public class ClientCertificateHandler : AuthorizationHandler<ClientCertificateRequirement>
 {
-    protected override Task HandleRequirementAsync(
-                                                    AuthorizationHandlerContext context,
+    protected override Task HandleRequirementAsync( AuthorizationHandlerContext context,
                                                     ClientCertificateRequirement requirement)
     {
         // .NET 8: Resource is HttpContext directly

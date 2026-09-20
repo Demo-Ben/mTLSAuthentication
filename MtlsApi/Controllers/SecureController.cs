@@ -10,7 +10,7 @@ namespace MtlsApi.Controllers
     {
         [HttpGet("ping")]
         //[Authorize]
-        //[Authorize(Policy = "ClientCertificate")]
+        [Authorize(Policy = "ClientCertificate")]
         public IActionResult Ping()
         {
             var cert = HttpContext.Connection.ClientCertificate;
@@ -20,7 +20,7 @@ namespace MtlsApi.Controllers
 
             return Ok(new
             {
-                message = "pong",
+                message = "mTLS Ping Successful!",
                 subject = cert.Subject,
                 thumbprint = cert.Thumbprint
             });
