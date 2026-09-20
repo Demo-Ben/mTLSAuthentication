@@ -9,27 +9,32 @@ var builder = WebApplication.CreateBuilder(args);
 // ------------------------------------------------------------
 // 1. Load Kestrel HTTPS + mTLS settings from appsettings.json
 // ------------------------------------------------------------
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    // This automatically picks up:
+//    // - Url: https://localhost:5001
+//    // - server.pfx certificate
+//    // - ClientCertificateMode: Require
+//    //
+//    // Because you already defined them in appsettings.json:
+//    //
+//    // "Kestrel": {
+//    //   "Endpoints": {
+//    //     "Https": {
+//    //       "Url": "https://localhost:5001",
+//    //       "Certificate": { ... },
+//    //       "ClientCertificateMode": "Require"
+//    //     }
+//    //   }
+//    // }
+//    //
+//    options.Configure(builder.Configuration.GetSection("Kestrel"));
+//});
 builder.WebHost.ConfigureKestrel(options =>
 {
-    // This automatically picks up:
-    // - Url: https://localhost:5001
-    // - server.pfx certificate
-    // - ClientCertificateMode: Require
-    //
-    // Because you already defined them in appsettings.json:
-    //
-    // "Kestrel": {
-    //   "Endpoints": {
-    //     "Https": {
-    //       "Url": "https://localhost:5001",
-    //       "Certificate": { ... },
-    //       "ClientCertificateMode": "Require"
-    //     }
-    //   }
-    // }
-    //
     options.Configure(builder.Configuration.GetSection("Kestrel"));
 });
+
 
 // ------------------------------------------------------------
 // 2. Add Certificate Authentication (mTLS)
