@@ -19,8 +19,8 @@ builder.Services.AddScoped(sp =>
 {
     // Load client certificate from file (dev only)
     var clientCert = new X509Certificate2(
-        "client.pfx",
-        "ClientCertPassword!",
+        "clientcerts/MtlsClient.pfx",
+        "MizuhoMtlsPassword-12345!",
         X509KeyStorageFlags.MachineKeySet |
         X509KeyStorageFlags.Exportable
     );
