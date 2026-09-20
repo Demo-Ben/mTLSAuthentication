@@ -10,7 +10,7 @@ namespace MtlsApi.Controllers
     {
         [HttpGet("ping")]
         //[Authorize]
-        [Authorize(Policy = "ClientCertificate")]
+        //[Authorize(Policy = "ClientCertificate")]
         public IActionResult Ping()
         {
             var cert = HttpContext.Connection.ClientCertificate;

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using MtlsApi.Authorization;
 using System.Security.Claims;
 
@@ -66,6 +67,18 @@ builder.Services
             }
         };
     });
+
+
+//server is actually requiring client certificates
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.ConfigureHttpsDefaults(httpsOptions =>
+//    {
+//        httpsOptions.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
+//        httpsOptions.CheckCertificateRevocation = false;
+//    });
+//});
+
 
 // ------------------------------------------------------------
 // 3. Add Authorization + Controllers
