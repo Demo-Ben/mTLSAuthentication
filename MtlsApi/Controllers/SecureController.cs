@@ -13,6 +13,9 @@ namespace MtlsApi.Controllers
         [Authorize(Policy = "ClientCertificate")]
         public IActionResult Ping()
         {
+            // It is not necessary to check for the certificate here, because the authorization handler
+            // will have already validated it.
+            // However, if you want to inspect the certificate details, you can do so.
             var cert = HttpContext.Connection.ClientCertificate;
 
             if (cert == null)
@@ -43,9 +46,17 @@ namespace MtlsApi.Controllers
             return Ok(new
             {
                 subject = cert.Subject,
+                issuer = cert.Issuer,
                 thumbprint = cert.Thumbprint,
-                issuer = cert.Issuer
+                publickey =cert.GetPublicKeyString()
             });
         }
     }
 }
+
+
+//Your API must validate:
+//    Certificate chain
+//    Certificate thumbprint
+//    Certificate subject
+//    Enhanced Key Usage (EKU)
