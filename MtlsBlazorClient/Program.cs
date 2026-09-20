@@ -15,30 +15,60 @@ var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localh
 // This HttpClient will be used to call the protected API.
 // It attaches the client certificate required by the server.
 //
-builder.Services.AddScoped(sp =>
-{
-    // Load client certificate from file (dev only)
-    var clientCert = new X509Certificate2(
-        "clientcerts/MtlsClient.pfx",
-        "MizuhoMtlsPassword-12345!",
-        X509KeyStorageFlags.MachineKeySet |
-        X509KeyStorageFlags.Exportable
-    );
+//builder.Services.AddScoped(sp =>
+//{
+//    var certPath = Path.Combine(
+//        builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx"
+//    );
 
-    var handler = new HttpClientHandler();
+//    // Load client certificate from file (dev only)
+//    var clientCert = new X509Certificate2(
+//        certPath,                            // or hard code: "clientcerts/MtlsClient.pfx",
+//        "MizuhoMtlsPassword-12345",
+//        X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable
+//    );
 
-    // Attach client certificate for mTLS
-    handler.ClientCertificates.Add(clientCert);
+//    var handler = new HttpClientHandler();
+//    handler.ClientCertificates.Add(clientCert);  //    // Attach client certificate for mTLS
 
-    // DEV ONLY: accept any server certificate
-    handler.ServerCertificateCustomValidationCallback =
-        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+//    // DEV ONLY: accept any server certificate
+//    handler.ServerCertificateCustomValidationCallback =
+//        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
-    return new HttpClient(handler)
-    {
-        BaseAddress = new Uri(apiBaseUrl)
-    };
-});
+//    return new HttpClient(handler)
+//    {
+//        BaseAddress = new Uri(apiBaseUrl)
+//    };
+//});
+
+
+builder.Services.AddHttpClient("MtlsClient", client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+        })
+        .ConfigurePrimaryHttpMessageHandler(() =>
+        {
+            var certPath = Path.Combine(
+                builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx"
+            );
+
+            var clientCert = new X509Certificate2(
+                certPath,
+                "MizuhoMtlsPassword-12345",
+                X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable
+            );
+
+            var handler = new HttpClientHandler();
+            handler.ClientCertificates.Add(clientCert);
+
+            // DEV ONLY
+            handler.ServerCertificateCustomValidationCallback =
+                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+
+            return handler;
+        });
+
+
 
 // ------------------------------------------------------------
 // STEP 3 — Add Blazor components
