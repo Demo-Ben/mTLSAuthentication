@@ -2,8 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using MtlsApi.Authorization;
 
-public class ClientCertificateHandler : AuthorizationHandler<ClientCertificateRequirement>
+public class ClientCertificateHandler 
+            : AuthorizationHandler<ClientCertificateRequirement>
 {
+    // HandleRequirementAsync is triggered automatically by ASP.NET Core at a very specific moment in the request pipeline
+    // — not when the client sends the certificate, not during TLS, not when the controller starts,
+    // but exactly when the authorization middleware evaluates your policy.
     protected override Task HandleRequirementAsync( AuthorizationHandlerContext context,
                                                     ClientCertificateRequirement requirement)
     {

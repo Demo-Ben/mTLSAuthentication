@@ -73,7 +73,6 @@ builder.Services
         };
     });
 
-
 // server is actually requiring client certificates
 //builder.WebHost.ConfigureKestrel(options =>
 //{
@@ -88,7 +87,7 @@ builder.Services
 // ------------------------------------------------------------
 // 3. Add Authorization + Controllers
 // ------------------------------------------------------------
-//builder.Services.AddAuthorization();
+//This tells ASP.NET Core that your API has a policy named "ClientCertificate".
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ClientCertificate", policy =>
@@ -96,8 +95,11 @@ builder.Services.AddAuthorization(options =>
         policy.Requirements.Add(new ClientCertificateRequirement());
     });
 });
-
+//This tells ASP.NET Core to use your custom certificate validator.
+// Register the certificate validation handler
 builder.Services.AddSingleton<IAuthorizationHandler, ClientCertificateHandler>();
+
+
 
 builder.Services.AddControllers();
 //builder.Services.AddEndpointsApiExplorer(); for minimal APIs, not needed for controllers
