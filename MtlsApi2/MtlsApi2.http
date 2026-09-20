@@ -1,0 +1,6 @@
+@MtlsApi2_HostAddress = http://localhost:5005
+
+GET {{MtlsApi2_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
