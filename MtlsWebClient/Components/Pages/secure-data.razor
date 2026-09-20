@@ -1,0 +1,35 @@
+﻿@page "/secure-data"
+@inject IHttpClientFactory ClientFactory
+
+<h3>Secure mTLS Data</h3>
+
+@if (loading)
+{
+    <p>Loading securely...</p>
+}
+else
+{
+    <p><b>Server Response:</b> @message</p>
+}
+
+@code {
+    private string message = "";
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var client = ClientFactory.CreateClient("SecureApi");
+            message = await client.GetStringAsync("api/secure/data");
+        }
+        catch (Exception ex)
+        {
+            message = $"Error connecting via mTLS: {ex.Message}";
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+}
