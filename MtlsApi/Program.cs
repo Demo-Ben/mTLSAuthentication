@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Certificate;
+using Microsoft.AspNetCore.Authorization;
+using MtlsApi.Authorization;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -68,7 +70,17 @@ builder.Services
 // ------------------------------------------------------------
 // 3. Add Authorization + Controllers
 // ------------------------------------------------------------
-builder.Services.AddAuthorization();
+//builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ClientCertificate", policy =>
+    {
+        policy.Requirements.Add(new ClientCertificateRequirement());
+    });
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, ClientCertificateHandler>();
+
 builder.Services.AddControllers();
 //builder.Services.AddEndpointsApiExplorer(); for minimal APIs, not needed for controllers
 builder.Services.AddSwaggerGen();
