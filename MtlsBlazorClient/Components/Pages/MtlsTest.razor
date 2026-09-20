@@ -26,6 +26,8 @@
 
             var client = httpClientFactory.CreateClient("MtlsClient");
 
+            //var resultTest = await client.GetStringAsync("api/secure/debug-cert");
+
             var result = await client.GetAsync("api/secure/ping");
             _response = await result.Content.ReadAsStringAsync();
         }

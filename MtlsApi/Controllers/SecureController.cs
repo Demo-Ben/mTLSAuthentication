@@ -31,5 +31,21 @@ namespace MtlsApi.Controllers
             //    User = User.Identity?.Name
             //});
         }
+
+        [HttpGet("debug-cert")]
+        public IActionResult DebugCert()
+        {
+            var cert = HttpContext.Connection.ClientCertificate;
+
+            if (cert == null)
+                return Ok("NO CLIENT CERT RECEIVED");
+
+            return Ok(new
+            {
+                subject = cert.Subject,
+                thumbprint = cert.Thumbprint,
+                issuer = cert.Issuer
+            });
+        }
     }
 }

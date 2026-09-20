@@ -74,7 +74,7 @@ builder.Services
     });
 
 
-//server is actually requiring client certificates
+// server is actually requiring client certificates
 //builder.WebHost.ConfigureKestrel(options =>
 //{
 //    options.ConfigureHttpsDefaults(httpsOptions =>
