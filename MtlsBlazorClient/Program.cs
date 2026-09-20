@@ -40,33 +40,66 @@ var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localh
 //});
 
 
+//Step 1
+var certPath = Path.Combine(builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx");
 
+var clientCert = new X509Certificate2(
+    certPath,
+    "MizuhoMtlsPassword-12345",
+    X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable
+);
+
+// Register in DI
+builder.Services.AddSingleton(clientCert);
+
+
+//STEP 2 — Use the DI certificate inside the handler
 builder.Services.AddHttpClient("MtlsClient", client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
 })
-//.AddHttpMessageHandler<DebugHandler>()
-.ConfigurePrimaryHttpMessageHandler(() =>
+.ConfigurePrimaryHttpMessageHandler(sp =>
 {
-    var certPath = Path.Combine(
-        builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx"
-    );
-
-    var clientCert = new X509Certificate2(
-        certPath,
-        "MizuhoMtlsPassword-12345",
-        X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable
-    );
+    var cert = sp.GetRequiredService<X509Certificate2>();
 
     var handler = new HttpClientHandler();
-    handler.ClientCertificates.Add(clientCert);
+    handler.ClientCertificates.Add(cert);
 
-    // DEV ONLY
     handler.ServerCertificateCustomValidationCallback =
         HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
     return handler;
 });
+
+
+
+// One step code (alternative approach) to register HttpClient with client certificate (mTLS)
+//builder.Services.AddHttpClient("MtlsClient", client =>
+//{
+//    client.BaseAddress = new Uri(apiBaseUrl);
+//})
+////.AddHttpMessageHandler<DebugHandler>()
+//.ConfigurePrimaryHttpMessageHandler(() =>
+//{
+//    var certPath = Path.Combine(
+//        builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx"
+//    );
+
+//    var clientCert = new X509Certificate2(
+//        certPath,
+//        "MizuhoMtlsPassword-12345",
+//        X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable
+//    );
+
+//    var handler = new HttpClientHandler();
+//    handler.ClientCertificates.Add(clientCert);
+
+//    // DEV ONLY
+//    handler.ServerCertificateCustomValidationCallback =
+//        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+
+//    return handler;
+//});
 
 
 
