@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using MtlsBlazorClient;
 using MtlsBlazorClient.Components;
+using MtlsBlazorClient.Components.Pages;
 using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -120,3 +121,55 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
+
+
+
+// mTLS Workflow Diagram (End‑to‑End)
+//┌──────────────────────────────┐
+//│ Blazor Client(MtlsTest page) │
+//└──────────────┬───────────────┘
+//               │ 1.User clicks "CallApi()"
+//               ▼
+//┌──────────────────────────────────────────────┐
+//│ HttpClient (with client certificate attached)│
+//└──────────────┬───────────────────────────────┘
+//               │ 2. Sends HTTPS request
+//               │    + attaches client certificate
+//               ▼
+//┌──────────────────────────────────────────────┐
+//│ TLS Handshake (Kestrel HTTPS endpoint)       │
+//│ ClientCertificateMode = RequireCertificate   │
+//└──────────────┬───────────────────────────────┘
+//               │ 3. Server requests client cert
+//               │ 4. Client sends certificate
+//               │ 5. Kestrel validates certificate format
+//               ▼
+//┌──────────────────────────────────────────────┐
+//│ ASP.NET Core Pipeline                        │
+//│ HttpContext.Connection.ClientCertificate     │
+//└──────────────┬───────────────────────────────┘
+//               │ 6. Certificate is now available
+//               ▼
+//┌──────────────────────────────────────────────┐
+//│ Authorization Handler (ClientCertificateHandler)
+//│ [Authorize(Policy="ClientCertificate")]       │
+//└──────────────┬───────────────────────────────┘
+//               │ 7. Handler checks certificate:
+//               │    - Subject
+//               │    - Thumbprint
+//               │    - Issuer
+//               │    - EKU
+//               ▼
+//┌──────────────────────────────────────────────┐
+//│ SecureController /api/secure/ping            │
+//└──────────────┬───────────────────────────────┘
+//               │ 8. Controller executes
+//               ▼
+//┌──────────────────────────────────────────────┐
+//│ API Response ("pong")                        │
+//└──────────────┬───────────────────────────────┘
+//               │ 9. HttpClient receives response
+//               ▼
+//┌──────────────────────────────┐
+//│ Blazor UI updates <pre>      │
+//└──────────────────────────────┘
