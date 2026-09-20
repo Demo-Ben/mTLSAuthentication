@@ -70,12 +70,21 @@ builder.Services
 // ------------------------------------------------------------
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
+//builder.Services.AddEndpointsApiExplorer(); for minimal APIs, not needed for controllers
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // ------------------------------------------------------------
 // 4. Middleware pipeline
 // ------------------------------------------------------------
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
