@@ -1,6 +1,4 @@
 <Solution>
   <Project Path="MtlsApi/MtlsApi.csproj" Id="862e3bc6-48ce-4230-9fb8-9e33d6ffd01c" />
   <Project Path="MtlsBlazorClient/MtlsBlazorClient.csproj" Id="4e33ddfa-04d1-4121-8da3-4e658a42cff9" />
-  <Project Path="MtlsWebApi/MtlsWebApi.csproj" Id="5be3e430-06ff-4045-bbf2-40f8ad65bb2e" />
-  <Project Path="MtlsWebClient/MtlsWebClient.csproj" Id="2227c7e7-d88f-44ef-87e6-ce9042829fd7" />
 </Solution>
