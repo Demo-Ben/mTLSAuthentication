@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Server.Kestrel.Https;
+using MtlsBlazorClient;
 using MtlsBlazorClient.Components;
 using System.Security.Cryptography.X509Certificates;
 
@@ -11,62 +13,60 @@ var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localh
 // ------------------------------------------------------------
 // STEP 2 — Register HttpClient with client certificate (mTLS)
 // ------------------------------------------------------------
-//
-// This HttpClient will be used to call the protected API.
-// It attaches the client certificate required by the server.
-//
-builder.Services.AddScoped(sp =>
+//builder.Services.AddScoped(sp =>
+//{
+//    var certPath = Path.Combine(
+//        builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx"
+//    );
+
+//    // Load client certificate from file (dev only)
+//    var clientCert = new X509Certificate2(
+//        certPath,                            // or hard code: "clientcerts/MtlsClient.pfx",
+//        "MizuhoMtlsPassword-12345",
+//        X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable
+//    );
+
+//    var handler = new HttpClientHandler();
+//    handler.ClientCertificates.Add(clientCert);  //    // Attach client certificate for mTLS
+
+//    // DEV ONLY: accept any server certificate
+//    handler.ServerCertificateCustomValidationCallback =
+//        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+
+//    return new HttpClient(handler)
+//    {
+//        BaseAddress = new Uri(apiBaseUrl)
+//    };
+//});
+
+
+
+builder.Services.AddHttpClient("MtlsClient", client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+})
+//.AddHttpMessageHandler<DebugHandler>()
+.ConfigurePrimaryHttpMessageHandler(() =>
 {
     var certPath = Path.Combine(
         builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx"
     );
 
-    // Load client certificate from file (dev only)
     var clientCert = new X509Certificate2(
-        certPath,                            // or hard code: "clientcerts/MtlsClient.pfx",
+        certPath,
         "MizuhoMtlsPassword-12345",
-        X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable
+        X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable
     );
 
     var handler = new HttpClientHandler();
-    handler.ClientCertificates.Add(clientCert);  //    // Attach client certificate for mTLS
+    handler.ClientCertificates.Add(clientCert);
 
-    // DEV ONLY: accept any server certificate
+    // DEV ONLY
     handler.ServerCertificateCustomValidationCallback =
         HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
-    return new HttpClient(handler)
-    {
-        BaseAddress = new Uri(apiBaseUrl)
-    };
+    return handler;
 });
-
-
-//builder.Services.AddHttpClient("MtlsClient", client =>
-//        {
-//            client.BaseAddress = new Uri(apiBaseUrl);
-//        })
-//        .ConfigurePrimaryHttpMessageHandler(() =>
-//        {
-//            var certPath = Path.Combine(
-//                builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx"
-//            );
-
-//            var clientCert = new X509Certificate2(
-//                certPath,
-//                "MizuhoMtlsPassword-12345",
-//                X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable
-//            );
-
-//            var handler = new HttpClientHandler();
-//            handler.ClientCertificates.Add(clientCert);
-
-//            // DEV ONLY
-//            handler.ServerCertificateCustomValidationCallback =
-//                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-
-//            return handler;
-//        });
 
 
 

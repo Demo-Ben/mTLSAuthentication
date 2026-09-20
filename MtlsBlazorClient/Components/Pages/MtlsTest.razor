@@ -2,8 +2,8 @@
 @attribute [StreamRendering]
 
 
-@inject HttpClient http  
-@* @inject IHttpClientFactory httpClientFactory *@
+@* @inject HttpClient http   *@
+@inject IHttpClientFactory httpClientFactory
 
 <h3>mTLS Test</h3>
 
@@ -21,12 +21,13 @@
     {
         try
         {
-            var result = await http.GetAsync("api/secure/ping");
-            _response = await result.Content.ReadAsStringAsync();
-
-            // var client = httpClientFactory.CreateClient("MtlsClient");
-            // var result = await client.GetAsync("api/secure/ping");
+            // var result = await http.GetAsync("api/secure/ping");
             // _response = await result.Content.ReadAsStringAsync();
+
+            var client = httpClientFactory.CreateClient("MtlsClient");
+
+            var result = await client.GetAsync("api/secure/ping");
+            _response = await result.Content.ReadAsStringAsync();
         }
         catch (Exception ex)
         {
