@@ -11,36 +11,50 @@ var builder = WebApplication.CreateBuilder(args);
 var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:5001/";
 
 
-//STEP 1 — Load certificate once at startup
+//Step 1 — Load certificate once at startup
 var certPath = Path.Combine(builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx");
-
-var clientCert = new X509Certificate2(
+var cert = new X509Certificate2(
     certPath,
     "MizuhoMtlsPassword-12345",
     X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable
 );
 
-// Register in DI
-builder.Services.AddSingleton(clientCert);
+//Step 2 — add the certificate to the HttpClient
+var handler = new HttpClientHandler();
+handler.ClientCertificates.Add(cert);
+handler.ServerCertificateCustomValidationCallback =
+    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
 
-//STEP 2 — Use the DI certificate inside the handler
+//Step 3. Register the HttpClient with the DI container, using the handler with the client certificate
 builder.Services.AddHttpClient("MtlsClient", client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
 })
-.ConfigurePrimaryHttpMessageHandler(sp =>
-{
-    var cert = sp.GetRequiredService<X509Certificate2>();
+.ConfigurePrimaryHttpMessageHandler(() => handler);
 
-    var handler = new HttpClientHandler();
-    handler.ClientCertificates.Add(cert);
 
-    handler.ServerCertificateCustomValidationCallback =
-        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+// the version use DI for AddSingleton(cert)
+//// Register in DI
+//builder.Services.AddSingleton(cert);
 
-    return handler;
-});
+////STEP 2 — Use the DI certificate inside the handler
+//builder.Services.AddHttpClient("MtlsClient", client =>
+//{
+//    client.BaseAddress = new Uri(apiBaseUrl);
+//})
+//.ConfigurePrimaryHttpMessageHandler(sp =>
+//{
+//    var cert = sp.GetRequiredService<X509Certificate2>();
+
+//    var handler = new HttpClientHandler();
+//    handler.ClientCertificates.Add(cert);
+
+//    handler.ServerCertificateCustomValidationCallback =
+//        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+
+//    return handler;
+//});
 
 
 
@@ -57,14 +71,14 @@ builder.Services.AddHttpClient("MtlsClient", client =>
 //        builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx"
 //    );
 
-//    var clientCert = new X509Certificate2(
+//    var cert = new X509Certificate2(
 //        certPath,
 //        "MizuhoMtlsPassword-12345",
 //        X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable
 //    );
 
 //    var handler = new HttpClientHandler();
-//    handler.ClientCertificates.Add(clientCert);
+//    handler.ClientCertificates.Add(cert);
 
 //    // DEV ONLY
 //    handler.ServerCertificateCustomValidationCallback =
