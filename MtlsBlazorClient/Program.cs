@@ -173,3 +173,24 @@ app.Run();
 //┌──────────────────────────────┐
 //│ Blazor UI updates <pre>      │
 //└──────────────────────────────┘
+
+
+//The API only trusts certificates issued by YOUR CA.
+
+//Your Company(CA)
+//    ↓ issues
+//Client Certificate (for Third Party)
+//    ↓ installed in
+//Third Party System
+//    ↓ used by
+//Third Party HttpClient
+//    ↓ during TLS handshake
+//Your API (validates certificate)
+
+
+//The 4 things your API must check to confirm the certificate is valid
+//Your API must validate:
+//    Certificate chain
+//    Certificate thumbprint
+//    Certificate subject
+//    Enhanced Key Usage (EKU)
