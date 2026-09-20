@@ -73,13 +73,17 @@ builder.Services
         };
     });
 
-// server is actually requiring client certificates
-//builder.WebHost.ConfigureKestrel(options =>
+// Instead of appsettings.json way. Uncomment the following code if you want to configure Kestrel programmatically
+// instead of using appsettings.json.
+//builder.WebHost.ConfigureKestrel(serverOptions =>
 //{
-//    options.ConfigureHttpsDefaults(httpsOptions =>
+//    serverOptions.ListenAnyIP(5001, listenOptions =>
 //    {
-//        httpsOptions.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
-//        httpsOptions.CheckCertificateRevocation = false;
+//        // Pass your pfx file, password, and an action to configure HttpsConnectionAdapterOptions
+//        listenOptions.UseHttps("MtlsServer.pfx", "MtlsPassword-12345!", adapterOptions =>
+//        {
+//            adapterOptions.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
+//        });
 //    });
 //});
 
