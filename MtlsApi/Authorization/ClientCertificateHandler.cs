@@ -55,6 +55,8 @@ public class ClientCertificateHandler : AuthorizationHandler<ClientCertificateRe
             return Task.CompletedTask;
         }
 
+        //if httpContext.Connection.ClientCertificate is null, that means the TLS handshake succeeded,
+        //but no client certificate was actually sent to the server.
         var cert = httpContext.Connection.ClientCertificate;
 
         if (cert == null)
