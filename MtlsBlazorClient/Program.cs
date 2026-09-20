@@ -10,37 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 // ------------------------------------------------------------
 var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:5001/";
 
-// ------------------------------------------------------------
-// STEP 2 — Register HttpClient with client certificate (mTLS)
-// ------------------------------------------------------------
-//builder.Services.AddScoped(sp =>
-//{
-//    var certPath = Path.Combine(
-//        builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx"
-//    );
 
-//    // Load client certificate from file (dev only)
-//    var clientCert = new X509Certificate2(
-//        certPath,                            // or hard code: "clientcerts/MtlsClient.pfx",
-//        "MizuhoMtlsPassword-12345",
-//        X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable
-//    );
-
-//    var handler = new HttpClientHandler();
-//    handler.ClientCertificates.Add(clientCert);  //    // Attach client certificate for mTLS
-
-//    // DEV ONLY: accept any server certificate
-//    handler.ServerCertificateCustomValidationCallback =
-//        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-
-//    return new HttpClient(handler)
-//    {
-//        BaseAddress = new Uri(apiBaseUrl)
-//    };
-//});
-
-
-//Step 1
+//STEP 1 — Load certificate once at startup
 var certPath = Path.Combine(builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx");
 
 var clientCert = new X509Certificate2(
@@ -74,6 +45,7 @@ builder.Services.AddHttpClient("MtlsClient", client =>
 
 
 // One step code (alternative approach) to register HttpClient with client certificate (mTLS)
+// *****************************************************************************************
 //builder.Services.AddHttpClient("MtlsClient", client =>
 //{
 //    client.BaseAddress = new Uri(apiBaseUrl);
