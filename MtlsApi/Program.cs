@@ -52,11 +52,15 @@ builder.Services
                 var cert = context.ClientCertificate;
 
                 // Example validation: check CN
-                if (cert.Subject.Contains("CN=MtlsClient"))
+                //if (cert.Subject.Contains("CN=MtlsClient"))
+                if(cert.Subject.Contains("MtlsClient", StringComparison.OrdinalIgnoreCase))
                 {
                     var claims = new[]
                     {
                         new Claim(ClaimTypes.Name, "mtls-client")
+                        // If you need to check specific roles or permissions:
+                        //new Claim(ClaimTypes.Role, "ApiClient"), // Example role
+                        //new Claim(ClaimTypes.Thumbprint, cert.Thumbprint) // Store thumbprint for tracking
                     };
 
                     var identity = new ClaimsIdentity(claims, context.Scheme.Name);
