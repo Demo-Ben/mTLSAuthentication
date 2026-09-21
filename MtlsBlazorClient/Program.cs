@@ -11,8 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 // ------------------------------------------------------------
 var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:5001/";
 
-
-//Step 1 — Load certificate once at startup
+// 2. Load the certificate from disk using its password and storage flags
+// - PersistKeySet: Keeps the key container alive so Windows can access the private key securely
+// - Exportable: Allows the key to be exported if needed later
 var certPath = Path.Combine(builder.Environment.ContentRootPath, "clientcerts", "MtlsClient.pfx");
 var cert = new X509Certificate2(
     certPath,
@@ -20,43 +21,56 @@ var cert = new X509Certificate2(
     X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable
 );
 
-//Step 2 — add the certificate to the HttpClient
-var handler = new HttpClientHandler();
-handler.ClientCertificates.Add(cert);
-handler.ServerCertificateCustomValidationCallback =
-    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
+// **********************************************************************************
+// First approach (commented out) to register HttpClient with client certificate (mTLS)
+// **********************************************************************************
+// 3. Configure the HTTP message handler to attach the client certificate for mTLS
+//var handler = new HttpClientHandler();
+//handler.ClientCertificates.Add(cert);
 
-//Step 3. Register the HttpClient with the DI container, using the handler with the client certificate
-builder.Services.AddHttpClient("MtlsClient", client =>
-{
-    client.BaseAddress = new Uri(apiBaseUrl);
-})
-.ConfigurePrimaryHttpMessageHandler(() => handler);
+// 4. Bypass strict server certificate validation (helpful for local development with self-signed server certs)
+// WARNING: Remove or replace with proper trust logic in production environments.
+//handler.ServerCertificateCustomValidationCallback =
+//    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
-
-// The version use DI for AddSingleton(cert)
-//// Register in DI
-//builder.Services.AddSingleton(cert);
-
-////STEP 2 — Use the DI certificate inside the handler
+// 5. Register a named HttpClient in Dependency Injection using this custom handler
 //builder.Services.AddHttpClient("MtlsClient", client =>
 //{
 //    client.BaseAddress = new Uri(apiBaseUrl);
 //})
-//.ConfigurePrimaryHttpMessageHandler(sp =>
-//{
-//    var cert = sp.GetRequiredService<X509Certificate2>();
+//.ConfigurePrimaryHttpMessageHandler(() => handler);
+// **********************************************************************************
 
-//    var handler = new HttpClientHandler();
-//    handler.ClientCertificates.Add(cert);
 
-//    handler.ServerCertificateCustomValidationCallback =
-//        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+// **********************************************************************************
+// Second approach (preferred) to register HttpClient with client certificate (mTLS)
+// **********************************************************************************
 
-//    return handler;
-//});
+// 3. Register the certificate instance as a Singleton in DI so it can be shared cleanly across services
+builder.Services.AddSingleton(cert);
 
+// 4. Register the named HttpClient and inject the certificate from the DI container into the message handler
+builder.Services.AddHttpClient("MtlsClient", client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+})
+.ConfigurePrimaryHttpMessageHandler(sp =>
+{
+    //Resolve the certificate instance from DI
+    var cert = sp.GetRequiredService<X509Certificate2>();
+
+    var handler = new HttpClientHandler();
+    handler.ClientCertificates.Add(cert);
+
+    //Bypass strict server validation for local self-signed dev certificate   
+    handler.ServerCertificateCustomValidationCallback =
+           HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+
+    return handler;
+});
+
+// **********************************************************************************
 
 
 // One step code (alternative approach) to register HttpClient with client certificate (mTLS)
