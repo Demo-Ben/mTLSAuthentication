@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MtlsApi/MtlsApi.csproj" Id="862e3bc6-48ce-4230-9fb8-9e33d6ffd01c" />
+  <Project Path="MtlsBlazorClient/MtlsBlazorClient.csproj" Id="4e33ddfa-04d1-4121-8da3-4e658a42cff9" />
+</Solution>
