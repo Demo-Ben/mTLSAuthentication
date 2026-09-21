@@ -25,7 +25,13 @@ namespace MtlsApi.Controllers
             {
                 message = "mTLS Ping Successful!",
                 subject = cert.Subject,
-                thumbprint = cert.Thumbprint
+                issuer = cert.Issuer,                  // Who issued the certificate
+                thumbprint = cert.Thumbprint,          // Unique SHA-1 identifier
+                serialNumber = cert.SerialNumber,      // Certificate serial number
+                validFrom = cert.NotBefore,            // Start date of validity
+                validTo = cert.NotAfter,               // Expiration date
+                version = cert.Version,                // X.509 version (usually 3)
+                hasPrivateKey = cert.HasPrivateKey     // Confirms if the server/client context sees the private key
             });
 
             //return Ok(new
