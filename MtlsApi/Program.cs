@@ -58,7 +58,7 @@ builder.Services
                     var claims = new[]
                     {
                         new Claim(ClaimTypes.Name, "mtls-client")
-                       // Optional: Add roles or track the certificate thumbprint if needed
+                        // Optional: Add roles or track the certificate thumbprint if needed
                         // new Claim(ClaimTypes.Role, "ApiClient"),
                         // new Claim(ClaimTypes.Thumbprint, cert.Thumbprint)
                     };
