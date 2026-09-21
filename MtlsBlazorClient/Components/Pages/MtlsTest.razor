@@ -1,13 +1,13 @@
-﻿@page "/MtlsTest"
+﻿@page "/MTLSTest"
 @attribute [StreamRendering]
 
 
 @* @inject HttpClient http   *@
 @inject IHttpClientFactory httpClientFactory
 
-<h3>mTLS Test</h3>
+<h3>Mutual Transport Layer Security (mTLS) Test</h3>
 
-<button @onclick="CallApi">Call Secure API</button>
+<button @onclick="CallApi">Call Secured API</button>
 
 @if (_response != null)
 {

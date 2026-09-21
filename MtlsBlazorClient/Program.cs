@@ -35,7 +35,7 @@ builder.Services.AddHttpClient("MtlsClient", client =>
 .ConfigurePrimaryHttpMessageHandler(() => handler);
 
 
-// the version use DI for AddSingleton(cert)
+// The version use DI for AddSingleton(cert)
 //// Register in DI
 //builder.Services.AddSingleton(cert);
 
