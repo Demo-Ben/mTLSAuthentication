@@ -6,39 +6,39 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ------------------------------------------------------------
-// 1. Load Kestrel HTTPS + mTLS settings from appsettings.json
-// ------------------------------------------------------------
-//builder.WebHost.ConfigureKestrel(options =>
-//{
-//    // This automatically picks up:
-//    // - Url: https://localhost:5001
-//    // - server.pfx certificate
-//    // - ClientCertificateMode: Require
-//    //
-//    // Because you already defined them in appsettings.json:
-//    //
-//    // "Kestrel": {
-//    //   "Endpoints": {
-//    //     "Https": {
-//    //       "Url": "https://localhost:5001",
-//    //       "Certificate": { ... },
-//    //       "ClientCertificateMode": "Require"
-//    //     }
-//    //   }
-//    // }
-//    //
-//    options.Configure(builder.Configuration.GetSection("Kestrel"));
-//});
+// ============================================================
+// 1. Kestrel & mTLS Server Configuration
+// ============================================================
+// Configures Kestrel using endpoint definitions from appsettings.json,
+// which enforces ClientCertificateMode.RequireCertificate for mTLS.
+// This automatically picks up:
+//      - Url: https://localhost:5001
+//      - MtlsServer.pfx certificate
+//      - ClientCertificateMode: Require
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Configure(builder.Configuration.GetSection("Kestrel"));
 });
 
+// Alternative: Configure Kestrel programmatically instead of appsettings.json
+// builder.WebHost.ConfigureKestrel(serverOptions =>
+// {
+//     serverOptions.ListenAnyIP(5001, listenOptions =>
+//     {
+//         listenOptions.UseHttps("MtlsServer.pfx", "MtlsPassword-12345!", adapterOptions =>
+//         {
+//             adapterOptions.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
+//         });
+//     });
+// });
 
-// ------------------------------------------------------------
-// 2. Add Certificate Authentication (mTLS)
-// ------------------------------------------------------------
+
+
+// ============================================================
+// 2. Certificate Authentication Setup (mTLS Validation)
+// ============================================================
+// Registers certificate authentication and implements validation rules
+// to map incoming client certificates into an authenticated ClaimsPrincipal.
 builder.Services
     .AddAuthentication(CertificateAuthenticationDefaults.AuthenticationScheme)
     .AddCertificate(options =>
@@ -51,16 +51,16 @@ builder.Services
             {
                 var cert = context.ClientCertificate;
 
-                // Example validation: check CN
+                // Validate the client certificate subject (case-insensitive match for MtlsClient)
                 //if (cert.Subject.Contains("CN=MtlsClient"))
-                if(cert.Subject.Contains("MtlsClient", StringComparison.OrdinalIgnoreCase))
+                if (cert.Subject.Contains("MtlsClient", StringComparison.OrdinalIgnoreCase))
                 {
                     var claims = new[]
                     {
                         new Claim(ClaimTypes.Name, "mtls-client")
-                        // If you need to check specific roles or permissions:
-                        //new Claim(ClaimTypes.Role, "ApiClient"), // Example role
-                        //new Claim(ClaimTypes.Thumbprint, cert.Thumbprint) // Store thumbprint for tracking
+                       // Optional: Add roles or track the certificate thumbprint if needed
+                        // new Claim(ClaimTypes.Role, "ApiClient"),
+                        // new Claim(ClaimTypes.Thumbprint, cert.Thumbprint)
                     };
 
                     var identity = new ClaimsIdentity(claims, context.Scheme.Name);
@@ -92,10 +92,10 @@ builder.Services
 //});
 
 
-// ------------------------------------------------------------
-// 3. Add Authorization + Controllers
-// ------------------------------------------------------------
-//This tells ASP.NET Core that your API has a policy named "ClientCertificate".
+// ============================================================
+// 3. Authorization Policy Registration
+// ============================================================
+// Defines a custom authorization policy requiring client certificate validation.
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ClientCertificate", policy =>
@@ -103,14 +103,13 @@ builder.Services.AddAuthorization(options =>
         policy.Requirements.Add(new ClientCertificateRequirement());
     });
 });
+
+
 //This tells ASP.NET Core to use your custom certificate validator.
 // Register the certificate validation handler
 builder.Services.AddSingleton<IAuthorizationHandler, ClientCertificateHandler>();
 
-
-
 builder.Services.AddControllers();
-//builder.Services.AddEndpointsApiExplorer(); for minimal APIs, not needed for controllers
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
