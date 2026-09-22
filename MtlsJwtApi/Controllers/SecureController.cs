@@ -9,7 +9,6 @@ namespace MtlsJwtApi.Controllers
     public class SecureController : ControllerBase
     {
         [HttpGet("ping")]
-        //[Authorize]
         [Authorize(Policy = "ClientCertificate")]
         public IActionResult Ping()
         {
@@ -33,12 +32,6 @@ namespace MtlsJwtApi.Controllers
                 version = cert.Version,                // X.509 version (usually 3)
                 hasPrivateKey = cert.HasPrivateKey     // Confirms if the server/client context sees the private key
             });
-
-            //return Ok(new
-            //{
-            //    Message = "mTLS OK",
-            //    User = User.Identity?.Name
-            //});
         }
 
         [HttpGet("debug-cert")]
