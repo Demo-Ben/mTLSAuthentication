@@ -1,0 +1,6 @@
+@MtlsJwtApi_HostAddress = http://localhost:5177
+
+GET {{MtlsJwtApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
