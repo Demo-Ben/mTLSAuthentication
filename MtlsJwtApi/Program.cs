@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.IdentityModel.Tokens;
 using MtlsJwtApi.Authorization;
-using MtlsJwtApi.Authorization;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
