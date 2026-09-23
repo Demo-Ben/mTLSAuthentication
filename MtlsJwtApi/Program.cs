@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.IdentityModel.Tokens;
 using MtlsJwtApi.Authorization;
 using System.Security.Claims;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,9 +43,12 @@ builder.WebHost.ConfigureKestrel(options =>
 // ============================================================
 // Registers certificate authentication and implements validation rules
 // to map incoming client certificates into an authenticated ClaimsPrincipal.
-builder.Services
-    //.AddAuthentication(CertificateAuthenticationDefaults.AuthenticationScheme)
-    .AddAuthentication(options =>
+
+// Get JWT Authentication Configuration
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+
+builder.Services.AddAuthentication(options =>
     {
         // IMPORTANT: allow BOTH schemes
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -54,15 +58,11 @@ builder.Services
     .AddCertificate(options =>
     {
         options.AllowedCertificateTypes = CertificateTypes.All;
-
         options.Events = new CertificateAuthenticationEvents
         {
             OnCertificateValidated = context =>
             {
                 var cert = context.ClientCertificate;
-
-                // Validate the client certificate subject (case-insensitive match for MtlsClient)
-                //if (cert.Subject.Contains("CN=MtlsClient"))
                 if (cert.Subject.Contains("MtlsClient", StringComparison.OrdinalIgnoreCase))
                 {
                     var claims = new[]
@@ -89,15 +89,19 @@ builder.Services
     // ------------------ JWT ------------------
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {
-        options.Authority = builder.Configuration["Jwt:Authority"];   // e.g. https://login.microsoftonline.com/{tenant}
-        options.Audience = builder.Configuration["Jwt:Audience"];    // your API App ID
+        //options.Authority = builder.Configuration["Jwt:Authority"];   // e.g. https://login.microsoftonline.com/{tenant}
+        //options.Audience = builder.Configuration["Jwt:Audience"];    // your API App ID
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
 
