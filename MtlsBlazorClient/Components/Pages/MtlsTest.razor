@@ -29,10 +29,9 @@
         try
         {
             var jsonElement = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(rawJson);
-            _response = System.Text.Json.JsonSerializer.Serialize(jsonElement, new System.Text.Json.JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            _response = System.Text.Json.JsonSerializer.Serialize(jsonElement, 
+                                 new System.Text.Json.JsonSerializerOptions { WriteIndented = true }
+                            );
         }
         catch 
         {
