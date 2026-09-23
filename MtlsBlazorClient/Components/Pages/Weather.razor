@@ -8,8 +8,16 @@
 
 <p>This component demonstrates showing data.</p>
 
-@if (_forecasts == null)
+@if (!string.IsNullOrEmpty(errorMessage))
 {
+    <!-- 1. If there's an error, show it immediately and don't say "Loading..." -->
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+else if (_forecasts == null)
+{
+    <!-- 2. If there's no error but data hasn't arrived yet, show Loading... -->
     <p><em>Loading...</em></p>
 }
 else
@@ -50,6 +58,8 @@ else
         }
         catch (Exception ex)
         {
+            //errorMessage = "Access Denied: You are not logged in or your session has expired.";
+            errorMessage = ex.Message;
             Console.WriteLine($"Error calling API: {ex.Message}");
         }
     }
