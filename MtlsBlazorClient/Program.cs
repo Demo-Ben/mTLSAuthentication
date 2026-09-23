@@ -63,7 +63,7 @@ builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 
 // 4. Register the named HttpClient and inject the certificate from the DI container into the message handler
-builder.Services.AddHttpClient("MtlsClient", async (sp, client) =>
+builder.Services.AddHttpClient("ApiClient", async (sp, client) =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
 

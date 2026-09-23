@@ -22,7 +22,7 @@
         // var result = await http.GetAsync("api/secure/ping");
         // _response = await result.Content.ReadAsStringAsync();
 
-        var client = httpClientFactory.CreateClient("MtlsClient");
+        var client = httpClientFactory.CreateClient("ApiClient");
         var result = await client.GetAsync("api/secure/ping");
         var rawJson = await result.Content.ReadAsStringAsync();
 
