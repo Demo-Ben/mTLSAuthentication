@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Server.Kestrel.Https;
 using MtlsApi.Authorization;
 using System.Security.Claims;
 
@@ -19,6 +18,8 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.Configure(builder.Configuration.GetSection("Kestrel"));
 });
+
+builder.Services.AddControllers();
 
 // Alternative: Configure Kestrel programmatically instead of appsettings.json
 // builder.WebHost.ConfigureKestrel(serverOptions =>
@@ -108,8 +109,6 @@ builder.Services.AddAuthorization(options =>
 //This tells ASP.NET Core to use your custom certificate validator.
 // Register the certificate validation handler
 builder.Services.AddSingleton<IAuthorizationHandler, ClientCertificateHandler>();
-
-builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
