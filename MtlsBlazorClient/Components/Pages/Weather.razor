@@ -1,5 +1,6 @@
 ﻿@page "/weather"
 @attribute [StreamRendering]
+@inject IHttpClientFactory _clientFactory
 
 <PageTitle>Weather</PageTitle>
 
@@ -7,7 +8,7 @@
 
 <p>This component demonstrates showing data.</p>
 
-@if (forecasts == null)
+@if (_forecasts == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -23,7 +24,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var forecast in _forecasts)
             {
                 <tr>
                     <td>@forecast.Date.ToShortDateString()</td>
@@ -36,7 +37,33 @@ else
     </table>
 }
 
+
 @code {
+    private WeatherForecast[]? _forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var client = _clientFactory.CreateClient("ApiClient");
+            _forecasts = await client.GetFromJsonAsync<WeatherForecast[]>("api/weather");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error calling API: {ex.Message}");
+        }
+    }
+
+    public class WeatherForecast
+    {
+        public DateOnly Date { get; set; }
+        public int TemperatureC { get; set; }
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        public string? Summary { get; set; }
+    }
+}
+
+@* @code {
     private WeatherForecast[]? forecasts;
 
     protected override async Task OnInitializedAsync()
@@ -62,3 +89,4 @@ else
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
     }
 }
+ *@
