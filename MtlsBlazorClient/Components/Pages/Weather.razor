@@ -46,8 +46,8 @@ else
     {
         try
         {
-            var client = _clientFactory.CreateClient("ApiClient");
-            _forecasts = await client.GetFromJsonAsync<WeatherForecast[]>("api/weather");
+            var client = _clientFactory.CreateClient("MtlsClient");
+            _forecasts = await client.GetFromJsonAsync<WeatherForecast[]>("api/WeatherForecast");
         }
         catch (Exception ex)
         {

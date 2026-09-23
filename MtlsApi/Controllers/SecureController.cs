@@ -9,7 +9,6 @@ namespace MtlsApi.Controllers
     public class SecureController : ControllerBase
     {
         [HttpGet("ping")]
-        //[Authorize]
         [Authorize(Policy = "ClientCertificate")]
         public IActionResult Ping()
         {

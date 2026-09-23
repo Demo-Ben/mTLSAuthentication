@@ -1,5 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MtlsApi.Controllers;
 
 namespace MtlsApi.Controllers
 {
@@ -13,13 +13,13 @@ namespace MtlsApi.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
-
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
+        [Authorize(Policy = "ClientCertificate")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
