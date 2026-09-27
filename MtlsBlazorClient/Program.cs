@@ -8,10 +8,6 @@ using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ------------------------------------------------------------
-// STEP 1 — Read API BaseUrl from appsettings.json
-// ------------------------------------------------------------
-var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:5001/";
 
 // 2. Load the certificate from disk using its password and storage flags
 // - PersistKeySet: Keeps the key container alive so Windows can access the private key securely
@@ -39,7 +35,7 @@ var cert = new X509Certificate2(
 // 5. Register a named HttpClient in Dependency Injection using this custom handler
 //builder.Services.AddHttpClient("MtlsClient", client =>
 //{
-//    client.BaseAddress = new Uri(apiBaseUrl);
+//    client.BaseAddress = new Uri(apiRemoteApiUrl);
 //})
 //.ConfigurePrimaryHttpMessageHandler(() => handler);
 // **********************************************************************************
@@ -63,9 +59,10 @@ builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 
 // 4. Register the named HttpClient and inject the certificate from the DI container into the message handler
+var apiRemoteApiUrl = builder.Configuration["ApiSettings:RemoteApiUrl"] ?? "https://localhost:5000/";
 builder.Services.AddHttpClient("ApiClient", async (sp, client) =>
 {
-    client.BaseAddress = new Uri(apiBaseUrl);
+    client.BaseAddress = new Uri(apiRemoteApiUrl);
 
     // ** Register a service to fetch JWT tokens
     //var jwtService = sp.GetRequiredService<IJwtTokenService>();
@@ -94,7 +91,7 @@ builder.Services.AddHttpClient("ApiClient", async (sp, client) =>
 // *****************************************************************************************
 //builder.Services.AddHttpClient("MtlsClient", client =>
 //{
-//    client.BaseAddress = new Uri(apiBaseUrl);
+//    client.BaseAddress = new Uri(apiRemoteApiUrl);
 //})
 ////.AddHttpMessageHandler<DebugHandler>()
 //.ConfigurePrimaryHttpMessageHandler(() =>
