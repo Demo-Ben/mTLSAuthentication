@@ -1,13 +1,10 @@
-using Microsoft.AspNetCore.Server.Kestrel.Https;
-using MtlsBlazorClient;
 using MtlsBlazorClient.Components;
-using MtlsBlazorClient.Components.Pages;
 using MtlsBlazorClient.Services;
-using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var apiRemoteApiUrl = builder.Configuration["ApiSettings:RemoteApiUrl"] ?? "https://localhost:5000/";
 
 // 2. Load the certificate from disk using its password and storage flags
 // - PersistKeySet: Keeps the key container alive so Windows can access the private key securely
@@ -54,12 +51,10 @@ builder.Services.AddSingleton(cert);
 // ------------------------------------------------------------
 // STEP 4 — Register HttpClient that sends BOTH mTLS + JWT
 // ------------------------------------------------------------
-// ------------------------------------------------------------
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 
 // 4. Register the named HttpClient and inject the certificate from the DI container into the message handler
-var apiRemoteApiUrl = builder.Configuration["ApiSettings:RemoteApiUrl"] ?? "https://localhost:5000/";
 builder.Services.AddHttpClient("ApiClient", async (sp, client) =>
 {
     client.BaseAddress = new Uri(apiRemoteApiUrl);
