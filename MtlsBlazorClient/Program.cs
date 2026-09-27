@@ -6,11 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 var apiRemoteApiUrl = builder.Configuration["ApiSettings:RemoteApiUrl"] ?? "https://localhost:5000/";
 
-//var webClientUrl = builder.Configuration["webClientUrl"]; // "https://localhost:5131/"
-//if (!string.IsNullOrEmpty(webClientUrl))
-//{
-//    builder.WebHost.UseUrls(webClientUrl);
-//}
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Configure(builder.Configuration.GetSection("Kestrel"));
+});
 
 // 2. Load the certificate from disk using its password and storage flags
 // - PersistKeySet: Keeps the key container alive so Windows can access the private key securely
