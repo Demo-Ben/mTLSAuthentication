@@ -2,7 +2,28 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>mTLS Authentication Demo</h1>
+<h1>Authentication by Certificate mTLS Demo</h1>
+
+<section style="margin-bottom: 2.5rem;">
+    <h2>Visual Workflow Diagram</h2>
+  
+    <p>This diagram outlines the complete request and validation journey from the Blazor client through the Certificate.</p>
+    
+    <div style="text-align: center; margin-top: 1rem;">
+        <img src="Tls-Handshake-Process.jpg" 
+             alt="ApiKeyMiddleware Workflow Diagram" 
+             style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    </div>
+@* 
+    <div class="card-body bg-dark text-light rounded">
+                <h5 class="card-title text-info mb-3">Authentication Architecture Flow</h5>
+
+                <!-- Image Display -->
+                <img src="workflow.jpg" alt="JWT Authentication Workflow Diagram" class="img-fluid rounded shadow" style="max-height: 500px;" />
+            </div> *@
+</section>
+
+<section>
 
 <div class="mtls-diagram-container">
     <h3>mTLS Workflow Diagram (End‑to‑End)</h3>
@@ -68,7 +89,7 @@ Third Party System
 Third Party HttpClient
     ↓ during TLS handshake
 Your API (validates certificate)
-    </pre>
+	</pre>
 </div>
 
 <style>
@@ -91,3 +112,5 @@ Your API (validates certificate)
         border: 1px solid #e0e0e0;
     }
 </style>
+
+    </section>
